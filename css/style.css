@@ -402,7 +402,7 @@ button {
 }
 
 .modal-input {
-    margin-right: 30px;
+    margin-right: 6px;
     height: 40px;
     padding: 10px;
     border-radius: 20px;
@@ -430,6 +430,13 @@ button {
     height: 40px;
 }
 
+.cart-clear{
+    background-color: red;
+    border-color: red;
+    display: block;
+    margin-left: auto;
+    height: 40px;
+}
 
 .mw-160 {
     max-width: 160px;
