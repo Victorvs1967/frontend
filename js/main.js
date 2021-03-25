@@ -24,7 +24,6 @@ const buttonCart = document.querySelector('.button-cart'),
 const openModal = () => {
 	cart.renderCart();
 	modalCart.classList.add('show');
-	// cart.deleteGood('099');
 };
 const closeModal = () => modalCart.classList.remove('show')
 const getGoods = () => fetch('db/db.json')
@@ -100,7 +99,7 @@ const cart = {
 document.addEventListener('click', event => {
 	const addToCart = event.target.closest('.add-to-cart');
 	if (addToCart) cart.addCartGoods(addToCart.dataset.id);
-
+	cart.renderCart();
 })
 
 cartTableGoods.addEventListener('click', event => {
@@ -134,7 +133,7 @@ const smoothScroll = () => {
 }
 
 // goods
-const createCard = ({ label, img, name, description, price}) => {
+const createCard = ({ id, label, img, name, description, price}) => {
 
 	const card = document.createElement('div');
 	card.className = 'col-lg-3 col-sm-6';
@@ -144,7 +143,7 @@ const createCard = ({ label, img, name, description, price}) => {
 			<img src=${'db/' + img} alt="image: Hoodie" class="goods-image">
 			<h3 class="goods-title">${name}</h3>
 			<p class="goods-description">${description}</p>
-			<button class="button goods-card-btn add-to-cart" data-id="007">
+			<button class="button goods-card-btn add-to-cart" data-id=${id}>
 				<span class="button-price">$${price}</span>
 			</button>
 		</div>
