@@ -17,7 +17,7 @@ const buttonCart = document.querySelector('.button-cart'),
 	showClothing = document.querySelectorAll('.show-clothing'),
 	cartTableGoods = document.querySelector('.cart-table__goods'),
 	cartTableTotal = document.querySelector('.card-table__total'),
-	cartCount = document.querySelector('.cart-count')
+	cartCount = document.querySelector('.cart-count'),
 	cartClear = document.querySelector('.cart-clear');
 
 //  cart
