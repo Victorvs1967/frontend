@@ -119,20 +119,14 @@ cartClear.addEventListener('click', event => {
 })
 
 // scroll smooth
-const smoothScroll = () => {
-	document.body.scrollIntoView({
-		behavior: "smooth",
-		block: "start"
-	});
-};
-
 {
 	for (const scrollLink of scrollLinks) scrollLink.addEventListener('click', event => {
 		event.preventDefault();
-		const id = event.target;
-
-
-		smoothScroll();
+		const id = scrollLink.getAttribute('href');
+		document.querySelector(id).scrollIntoView({
+			behavior: 'smooth',
+			block: 'start'
+		})
 	})
 }
 
