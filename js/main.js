@@ -7,6 +7,7 @@ const mySwiper = new Swiper('.swiper-container', {
 	},
 });
 
+// init variables
 const buttonCart = document.querySelector('.button-cart'),
 	modalCart = document.querySelector('#modal-cart'),
 	more = document.querySelector('.more'),
@@ -27,7 +28,7 @@ const openModal = () => {
 };
 const closeModal = () => modalCart.classList.remove('show')
 const getGoods = () => fetch('db/db.json')
-				.then(response => response.json());
+						.then(response => response.json());
 
 buttonCart.addEventListener('click', openModal);
 modalCart.addEventListener('click', event => {
@@ -128,6 +129,9 @@ const smoothScroll = () => {
 {
 	for (const scrollLink of scrollLinks) scrollLink.addEventListener('click', event => {
 		event.preventDefault();
+		const id = event.target;
+
+
 		smoothScroll();
 	})
 }
