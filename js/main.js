@@ -170,14 +170,12 @@ more.addEventListener('click', event => {
 	getGoods().then(renderCards);
 });
 
-navigationLink.forEach(link => {
-	link.addEventListener('click', event => {
+navigationLink.forEach(link => link.addEventListener('click', event => {
 		event.preventDefault();
 		const field = link.dataset.field;
 		const value = link.textContent;
 		filterCards(field, value);
-	})
-});
+}));
 
 showAcsesories.forEach(item => item.addEventListener('click', event => {
 	event.preventDefault();
