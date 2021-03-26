@@ -13,7 +13,8 @@ const buttonCart = document.querySelector('.button-cart'),
 	cartTableGoods = document.querySelector('.cart-table__goods'),
 	cartTableTotal = document.querySelector('.card-table__total'),
 	cartCount = document.querySelector('.cart-count'),
-	cartClear = document.querySelector('.cart-clear');
+	cartClear = document.querySelector('.cart-clear'),
+	modalForm = document.querySelector('.modal-form');
 
 //  cart
 const openModal = () => {
@@ -179,3 +180,28 @@ showClothing.forEach(item => item.addEventListener('click', event => {
 	filterCards('category', 'Clothing');
 	smoothScroll();
 }));
+
+// send data to server
+const postData = dataUser => fetch('server.php', {
+	method: 'POST',
+	body: dataUser,
+})
+
+modalForm.addEventListener('submit', event => {
+	event.preventDefault();
+	const formData = new FormData(modalForm);
+	formData.append('goods', JSON.stringify(cart.cartGoods));
+	postData(formData)
+	.then(response => {
+		if (!response.ok) {
+			throw new Error(response.status)
+		}
+		alert('Your goods sent!');
+	})
+	.catch(error => alert('Error: ' + error))
+	.finally(() => {
+		closeModal();
+		modalForm.reset();
+		cart.clearCart();
+	});
+})
