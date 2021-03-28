@@ -139,9 +139,6 @@ cartClear.addEventListener('click', event => {
 	cart.clearCart();
 })
 
-// scroll smooth
-smootnScroll();
-
 // goods
 const createCard = ({ id, label, img, name, description, price}) => {
 
@@ -256,4 +253,6 @@ modalForm.addEventListener('submit', event => {
 	}
 })
 
+// init
+smootnScroll();
 cart.quantity();
