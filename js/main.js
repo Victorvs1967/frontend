@@ -23,9 +23,9 @@ const openModal = () => {
 };
 const closeModal = () => modalCart.classList.remove('show')
 
-const checkGoods = async () => {
+const checkGoods = () => {
 	const data = [];
-	return () => await (data.length ? data : data.push(...fetch('db/db.json').then(response => response.json())));
+	return () => (data.length ? data : data.push(...fetch('./db/db.json').then(response => response.json())));
 }
 
 // const getGoods = checkGoods; 
@@ -37,9 +37,9 @@ modalCart.addEventListener('click', event => {
 });
 
 const cart = {
-	cartGoods: [],
+	cartGoods: JSON.parse(localStorage.getItem('cart')) || [],
 	updateLocalStorage() {
-		localStorage.setItem('cart', this.cartGoods);
+		localStorage.setItem('cart', JSON.stringify(this.cartGoods));
 	},
 	cartGoodsCount() {
 		return this.cartGoods.length;
@@ -116,6 +116,7 @@ const cart = {
 		this.quantity();
 	},
 }
+cartCount.textContent = cart.cartGoodsCount();
 
 document.addEventListener('click', event => {
 	const addToCart = event.target.closest('.add-to-cart');
@@ -231,8 +232,7 @@ modalForm.addEventListener('submit', event => {
 			data[name] = value;
 		}
 		data.cart = cart.cartGoods;
-		console.log(JSON.stringify(data));
-
+		
 		formData.append('cart', JSON.stringify(cart.cartGoods));
 		cart.updateLocalStorage();
 		postData(data)
@@ -255,3 +255,5 @@ modalForm.addEventListener('submit', event => {
 		}
 	}
 })
+
+cart.quantity();
