@@ -38,6 +38,9 @@ modalCart.addEventListener('click', event => {
 
 const cart = {
 	cartGoods: [],
+	updateLocalStorage() {
+		localStorage.setItem('cart', this.cartGoods);
+	},
 	cartGoodsCount() {
 		return this.cartGoods.length;
 	},
@@ -77,12 +80,14 @@ const cart = {
 										.then(data => data.find(item => item.id === id))
 										.then(({ id, name, price }) => {
 											this.cartGoods.push({ id, name, price, count: 1 });
+											this.updateLocalStorage();
 											this.quantity();										
 										});
 	},
 	deleteGood(id) {
 		this.cartGoods = this.cartGoods.filter(item => id !== item.id);
 		this.renderCart();
+		this.updateLocalStorage();
 		this.quantity();
 	},
 	minusGood(id) {
@@ -90,6 +95,7 @@ const cart = {
 			if (item.id === id) item.count > 1 ? item.count -= 1 : this.deleteGood(id);
 		}
 		this.renderCart();
+		this.updateLocalStorage();
 		this.quantity();
 	},
 	plusGood(id) {
@@ -100,11 +106,13 @@ const cart = {
 			}
 		}
 		this.renderCart();
+		this.updateLocalStorage();
 		this.quantity();
 	},
 	clearCart() {
 		this.cartGoods.length = 0;
 		this.renderCart();
+		this.updateLocalStorage();
 		this.quantity();
 	},
 }
@@ -191,9 +199,12 @@ showClothing.forEach(item => item.addEventListener('click', event => {
 }));
 
 // send data to server
-const postData = dataUser => fetch('/buy', {
+const postData = data => fetch('/buy', {
 	method: 'POST',
-	body: dataUser,
+	body: JSON.stringify(data),
+	headers: {
+		'Content-Type': 'application/json;charset=utf-8'
+	},
 });
 
 const validForm = data => {
@@ -215,8 +226,16 @@ modalForm.addEventListener('submit', event => {
 	const formData = new FormData(modalForm);
 
 	if (validForm(formData) && cart.cartGoodsCount()) {
+		const data = {};
+		for ( const [ name, value ] of formData) {
+			data[name] = value;
+		}
+		data.cart = cart.cartGoods;
+		console.log(JSON.stringify(data));
+
 		formData.append('cart', JSON.stringify(cart.cartGoods));
-		postData(formData)
+		cart.updateLocalStorage();
+		postData(data)
 		.then(response => {
 			if (!response.ok) {
 				throw new Error(response.status)
