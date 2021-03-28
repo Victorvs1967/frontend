@@ -8,7 +8,7 @@ const buttonCart = document.querySelector('.button-cart'),
 	more = document.querySelector('.more'),
 	navigationLink = document.querySelectorAll('.navigation-link'),
 	longGoodsList = document.querySelector('.long-goods-list'),
-	showAcsesories = document.querySelectorAll('.show-acsessories'),
+	showAccessories = document.querySelectorAll('.show-acsessories'),
 	showClothing = document.querySelectorAll('.show-clothing'),
 	cartTableGoods = document.querySelector('.cart-table__goods'),
 	cartTableTotal = document.querySelector('.card-table__total'),
@@ -23,11 +23,12 @@ const openModal = () => {
 };
 const closeModal = () => modalCart.classList.remove('show')
 
-const checkGoods = () => {
+const checkGoods = async () => {
 	const data = [];
-	return () => data.length ? data : data.push(...fetch('db/db.json').then(response => response.json()));
+	return () => await (data.length ? data : data.push(...fetch('db/db.json').then(response => response.json())));
 }
 
+// const getGoods = checkGoods; 
 const getGoods = () => fetch('db/db.json').then(response => response.json()); 
 
 buttonCart.addEventListener('click', openModal);
@@ -37,14 +38,20 @@ modalCart.addEventListener('click', event => {
 
 const cart = {
 	cartGoods: [],
+	cartGoodsCount() {
+		return this.cartGoods.length;
+	},
 	quantity() {
-		cartCount.textContent = this.cartGoods.reduce((sum, item) => sum + item.count, 0);
+		const count = this.cartGoods.reduce((sum, item) => sum + item.count, 0);
+		cartCount.textContent = count ? count : '';
 	},
 	renderCart() {
 		cartTableGoods.textContent = '';
 		this.cartGoods.forEach(({ id, name, price, count }) => {
 			const trGood = document.createElement('tr');
 			trGood.className = 'cart-item';
+			trGood.dataset.thObject = '${goods}';
+			trGood.dataset.thId = '*{id}';
 			trGood.dataset.id = id;
 			trGood.innerHTML = `
 				<td>${name}</td>
@@ -52,7 +59,7 @@ const cart = {
 				<td><button class="cart-btn-minus">-</button></td>
 				<td>${count}</td>
 				<td><button class="cart-btn-plus">+</button></td>
-				<td>${price * count}$</td>
+				<td>$${price * count}</td>
 				<td><button class="cart-btn-delete">x</button></td>
 			`;
 			cartTableGoods.append(trGood);
@@ -62,14 +69,16 @@ const cart = {
 			return sum + item.price * item.count;
 		}, 0);
 
-		cartTableTotal.textContent = totalPrice;
+		cartTableTotal.textContent = '$' + totalPrice;
 	},
 	addCartGoods(id) {
 		const goodItem = this.cartGoods.find(item => item.id === id);
 		goodItem ? this.plusGood(id) : getGoods()
 										.then(data => data.find(item => item.id === id))
-										.then(({ id, name, price }) => this.cartGoods.push({ id, name, price, count: 1 }));
-		this.quantity();
+										.then(({ id, name, price }) => {
+											this.cartGoods.push({ id, name, price, count: 1 });
+											this.quantity();										
+										});
 	},
 	deleteGood(id) {
 		this.cartGoods = this.cartGoods.filter(item => id !== item.id);
@@ -169,7 +178,7 @@ navigationLink.forEach(link => link.addEventListener('click', event => {
 		filterCards(field, value);
 }));
 
-showAcsesories.forEach(item => item.addEventListener('click', event => {
+showAccessories.forEach(item => item.addEventListener('click', event => {
 	event.preventDefault();
 	filterCards('category', 'Accessories');
 	smoothScroll();
@@ -182,26 +191,48 @@ showClothing.forEach(item => item.addEventListener('click', event => {
 }));
 
 // send data to server
-const postData = dataUser => fetch('server.php', {
+const postData = dataUser => fetch('/buy', {
 	method: 'POST',
 	body: dataUser,
-})
+});
+
+const validForm = data => {
+	let valid = false;
+	for (const [, value] of data) {
+		if (value.trim()) {
+			valid = true;
+		} else {
+			valid = false;
+			alert('Empty field!');
+			break;
+		}
+	}
+	return valid;
+};
 
 modalForm.addEventListener('submit', event => {
 	event.preventDefault();
 	const formData = new FormData(modalForm);
-	formData.append('goods', JSON.stringify(cart.cartGoods));
-	postData(formData)
-	.then(response => {
-		if (!response.ok) {
-			throw new Error(response.status)
+
+	if (validForm(formData) && cart.cartGoodsCount()) {
+		formData.append('cart', JSON.stringify(cart.cartGoods));
+		postData(formData)
+		.then(response => {
+			if (!response.ok) {
+				throw new Error(response.status)
+			}
+			alert('Your goods sent!');
+		})
+		.catch(error => alert('Error: ' + error))
+		.finally(() => {
+			closeModal();
+			modalForm.reset();
+			cart.clearCart();
+		});		
+	} else {
+		if (validForm(formData)) {
+			alert('Cart empty!');
+			closeModal();
 		}
-		alert('Your goods sent!');
-	})
-	.catch(error => alert('Error: ' + error))
-	.finally(() => {
-		closeModal();
-		modalForm.reset();
-		cart.clearCart();
-	});
+	}
 })
